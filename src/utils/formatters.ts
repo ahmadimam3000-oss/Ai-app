@@ -123,11 +123,23 @@ export const RENTAL_CS_DISPLAY = '082245508680';
 // Public Shared App URL so anyone with the link can open it without developer login restrictions
 export const PUBLIC_SHARED_APP_ORIGIN = 'https://ais-pre-r35iyxcpzmh7ca3oo42gnl-747732554400.asia-northeast1.run.app';
 
+export function normalizeGithubPagesUrl(rawUrl: string): string {
+  return rawUrl
+    .trim()
+    .replace(/\/+$/, '')
+    .replace(/(\.github\.io\/)ai-app$/i, '$1Ai-app')
+    .replace(/(\.github\.io\/)ai-rent-app$/i, '$1Ai-rent-app')
+    .replace(/(\.github\.io\/)management-rental$/i, '$1Management-rental');
+}
+
 export function getPublicAppBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const customGhUrl = localStorage.getItem('airent_github_pages_url_v1');
     if (customGhUrl && customGhUrl.trim().startsWith('http')) {
-      const cleaned = customGhUrl.trim().replace(/\/+$/, '');
+      const cleaned = normalizeGithubPagesUrl(customGhUrl);
+      if (cleaned !== customGhUrl.trim().replace(/\/+$/, '')) {
+        localStorage.setItem('airent_github_pages_url_v1', cleaned);
+      }
       return `${cleaned}/`;
     }
     const origin = window.location.origin;

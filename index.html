@@ -61,14 +61,16 @@
           hasRawTsxEntry &&
           (h.endsWith('.github.io') || h.endsWith('.pages.dev') || h.endsWith('.vercel.app') || h.endsWith('.netlify.app'))
         ) {
+          var segs = window.location.pathname.split('/').filter(Boolean);
+          var basePrefix = h.endsWith('.github.io') && segs.length > 0 ? '/' + segs[0] + '/' : './';
           var css = document.createElement('link');
           css.rel = 'stylesheet';
-          css.href = './live-bundle/app.css';
+          css.href = basePrefix + 'live-bundle/app.css';
           document.head.appendChild(css);
 
           var js = document.createElement('script');
           js.type = 'module';
-          js.src = './live-bundle/app.js';
+          js.src = basePrefix + 'live-bundle/app.js';
           document.body.appendChild(js);
         }
       })();

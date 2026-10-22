@@ -127,7 +127,12 @@ export const AppsScriptModal: React.FC<AppsScriptModalProps> = ({
     return saved;
   });
   const [ghRepoName, setGhRepoName] = useState(() => {
-    return localStorage.getItem('airent_gh_repo_v1') || 'Management-rental';
+    const saved = localStorage.getItem('airent_gh_repo_v1');
+    if (!saved) return 'Ai-app';
+    if (saved.toLowerCase() === 'ai-app') return 'Ai-app';
+    if (saved.toLowerCase() === 'ai-rent-app') return 'Ai-rent-app';
+    if (saved.toLowerCase() === 'management-rental') return 'Management-rental';
+    return saved;
   });
   const [savedGhPagesUrl, setSavedGhPagesUrl] = useState(() => {
     return localStorage.getItem('airent_github_pages_url_v1') || '';
@@ -202,6 +207,9 @@ export const AppsScriptModal: React.FC<AppsScriptModalProps> = ({
       }
       if (repoRes.ok) {
         const repoData = await repoRes.json();
+        if (repoData.name && repoData.name !== cleanRepo && repoData.name.toLowerCase() === cleanRepo.toLowerCase()) {
+          setGhRepoName(repoData.name);
+        }
         const latestSuccess = runsList.some((r) => r.conclusion === 'success');
         if (repoData.has_pages || latestSuccess) {
           setGhPagesStatus('Live (Aktif)');
