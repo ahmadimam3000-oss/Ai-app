@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MotorMaster, TransaksiSewa, PengeluaranMotor, FrequentRenter, GuaranteeIdType, CustomerCategory, YearlyRecapArchive } from './types/rental';
-import { ConnectedSheetInfo, getAccessToken, pushDataToGoogleSpreadsheet } from './services/googleSheetsService';
+import { ConnectedSheetInfo, getAccessToken, pushDataToGoogleSpreadsheet, syncRentalSnapshotToFirestore } from './services/googleSheetsService';
 import { 
   INITIAL_FLEET, 
   INITIAL_TRANSACTIONS, 
@@ -232,6 +232,9 @@ export default function App() {
             lastUpdated: updated.updatedAt || new Date().toISOString(),
             revision: updated.revision,
             connectedClients: updated.connectedClients || 1,
+          });
+          syncRentalSnapshotToFirestore(updated.revision).catch(() => {
+            // Firestore snapshot sync is optional when user is not logged in
           });
         }
         return true;

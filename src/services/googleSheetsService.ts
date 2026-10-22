@@ -11,6 +11,8 @@ import {
   getFirestore,
   doc,
   getDocFromServer,
+  setDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import {
   MotorMaster,
@@ -120,6 +122,22 @@ async function testConnection() {
   }
 }
 testConnection();
+
+export async function syncRentalSnapshotToFirestore(version = 1): Promise<void> {
+  const currentUser = auth.currentUser;
+  if (!currentUser?.uid) return;
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+  const path = `rentalSnapshots/${currentUser.uid}`;
+  try {
+    await setDoc(doc(db, 'rentalSnapshots', currentUser.uid), {
+      ownerId: currentUser.uid,
+      updatedAt: serverTimestamp(),
+      version: Math.max(1, Math.floor(version)),
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
 
 const provider = new GoogleAuthProvider();
 SCOPES.forEach((scope) => provider.addScope(scope));
